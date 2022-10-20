@@ -1,18 +1,22 @@
 #!/usr/bin/python3
-# Module that prints top 10 titles
+"""
+Contains the top_ten function
+"""
+
 import requests
 
 
 def top_ten(subreddit):
-    '''Prints titles of top 10 hot posts for subreddit'''
-    URL = 'https://www.reddit.com/r/{}/hot.json'.format(subreddit)
-    USERAGENT = {'User-Agent':
-                 'Unix:com.holberton.apiadvanced:task1 (by /u/_marc_marc_)'}
-    req = requests.get(URL, headers=USERAGENT)
-    if req.status_code is not 200:
+    """prints the titles of the top ten hot posts for a given subreddit"""
+    if subreddit is None or type(subreddit) is not str:
         print(None)
-        return
-    jreq = req.json()
-    data_path = jreq['data']['children']
-    for i in range(10):
-        print(data_path[i]['data']['title'])
+    r = requests.get('http://www.reddit.com/r/{}/hot.json'.format(subreddit),
+                     headers={'User-Agent': 'Python/requests:APIproject:\
+                     v1.0.0 (by /u/aaorrico23)'},
+                     params={'limit': 10}).json()
+    posts = r.get('data', {}).get('children', None)
+    if posts is None or (len(posts) > 0 and posts[0].get('kind') != 't3'):
+        print(None)
+    else:
+        for post in posts:
+            print(post.get('data', {}).get('title', None))
